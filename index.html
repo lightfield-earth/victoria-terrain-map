@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Greater Victoria Terrain</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="data:," /><!-- no favicon: skip the browser's /favicon.ico request (a 404 on every load) -->
+  <!-- start the style download and the tile/glyph connections while MapLibre itself loads -->
+  <link rel="preload" href="https://terrain-bw.lightfield.earth/style.json" as="fetch" crossorigin="anonymous" />
+  <link rel="preconnect" href="https://terrain-bw.lightfield.earth" crossorigin="anonymous" />
+  <link rel="preconnect" href="https://tiles.lightfield.earth" crossorigin="anonymous" />
+  <link rel="preconnect" href="https://lightfield-earth.github.io" crossorigin="anonymous" />
+  <!-- MapLibre is self-hosted (identical to the npm 4.7.1 dist) so the map never depends on a third-party CDN -->
+  <script src="./vendor/maplibre-gl-4.7.1/maplibre-gl.js"></script>
+  <script src="./tile-retry.js"></script>
+  <link href="./vendor/maplibre-gl-4.7.1/maplibre-gl.css" rel="stylesheet" />
+  <style>
+    body { margin: 0; }
+    /* wrapper is what goes fullscreen, so the logo comes along */
+    #map-wrap { position: absolute; inset: 0; background: #fff; }
+    #map { position: absolute; inset: 0; }
+    #logo { position: absolute; z-index: 1; bottom: 40px; left: 10px; padding: 5px;
+            background: #fff; border-radius: 4px; box-shadow: 0 0 0 2px rgba(0,0,0,.1); }
+    #logo img { display: block; height: 50px; width: auto; }
+  </style>
+</head>
+<body>
+  <div id="map-wrap">
+    <div id="map"></div>
+    <div id="logo"><img src="./lightfield-logo.png" alt="LightField" /></div>
+  </div>
+
+  <script>
+  // The cartography is the global grayscale style, loaded live from terrain-bw.lightfield.earth (repo
+  // copernicus-terrain-map-bw), so improvements there show up here. Victoria-specific changes go on top
+  // of it here. ?style=<url> loads another style, e.g. a local build while tuning.
+  const STYLE_URL = new URL(new URLSearchParams(location.search).get("style")
+                            || "https://terrain-bw.lightfield.earth/style.json", location.href).href;
+  fetch(STYLE_URL).then(r => r.json()).then((style) => {
+    style.sprite = new URL(style.sprite, STYLE_URL).href;   // the grayscale sprite ships next to style.json
+    TileRetry.installInWorkers();   // vector tiles are fetched in MapLibre's workers: retry them there
+    const map = new maplibregl.Map({
+      // route every tile/glyph/sprite request through the retrying loader (see tile-retry.js)
+      container: "map", style: TileRetry.wrapStyle(style), // the workshop extent: Sooke Lake Reservoir to Sidney, Sooke to Victoria
+      bounds: [[-123.85, 48.28], [-123.18, 48.76]], minZoom: 2, maxZoom: 16,
+      hash: true, attributionControl: false,
+    });
+    map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true } }), "top-right");
+    map.addControl(new maplibregl.NavigationControl({ showZoom: true, showCompass: true }), "top-right");
+    map.addControl(new maplibregl.FullscreenControl({ container: document.getElementById("map-wrap") }), "top-right");
+    map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+  });
+  </script>
+</body>
+</html>

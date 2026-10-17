@@ -13,6 +13,7 @@
   <!-- MapLibre is self-hosted (identical to the npm 4.7.1 dist) so the map never depends on a third-party CDN -->
   <script src="./vendor/maplibre-gl-4.7.1/maplibre-gl.js"></script>
   <script src="./tile-retry.js"></script>
+  <script src="./customize.js"></script><!-- Victoria-only style changes, shared with the print pipeline -->
   <link href="./vendor/maplibre-gl-4.7.1/maplibre-gl.css" rel="stylesheet" />
   <style>
     body { margin: 0; }
@@ -33,27 +34,7 @@
   <script>
   // The cartography is the global grayscale style, loaded live from terrain-bw.lightfield.earth (repo
   // copernicus-terrain-map-bw), so improvements there show up here. Victoria-specific changes go on top
-  // of it here. ?style=<url> loads another style, e.g. a local build while tuning.
-  // Victoria-only changes to the global style. Each targets a layer by id; if the global style renames
-  // or drops one, the change is skipped with a console warning rather than breaking the map.
-  function customizeForVictoria(style) {
-    const layer = (id) => style.layers.find((l) => l.id === id)
-      || console.warn(`victoria: layer "${id}" not in the global style; customization skipped`);
-
-    // The Salish Sea names the bioregion: draw it larger as you zoom in, letter-spaced like a sea.
-    // (The tiles class it `strait`, like any narrows, so it can only be picked out by name.)
-    const ocean = layer("Ocean labels");
-    if (ocean) {
-      const salish = ["==", ["get", "name"], "Salish Sea"], base = ocean.layout["text-size"] ?? 12;
-      // regular size out at z7, where it competes with city names; ~17.5 px at the z9.4 regional view
-      ocean.layout["text-size"] = ["interpolate", ["linear"], ["zoom"],
-        7, base, 9.5, ["case", salish, 17.5, base], 12, ["case", salish, 22, base]];
-      ocean.layout["text-letter-spacing"] = ["interpolate", ["linear"], ["zoom"],
-        7, ["case", salish, 0.1, 0], 9.5, ["case", salish, 0.25, 0]];
-      ocean.layout["text-max-width"] = ["case", salish, 20, ocean.layout["text-max-width"] ?? 10];   // one line
-    }
-  }
-
+  // of it in customize.js. ?style=<url> loads another style, e.g. a local build while tuning.
   const STYLE_URL = new URL(new URLSearchParams(location.search).get("style")
                             || "https://terrain-bw.lightfield.earth/style.json", location.href).href;
   fetch(STYLE_URL).then(r => r.json()).then((style) => {
@@ -63,8 +44,9 @@
     const map = new maplibregl.Map({
       // route every tile/glyph/sprite request through the retrying loader (see tile-retry.js)
       container: "map", style: TileRetry.wrapStyle(style),
-      // the workshop extent: Sooke Lake Reservoir to Sidney, Sooke to Victoria
-      bounds: [[-123.85, 48.28], [-123.18, 48.76]], minZoom: 2, maxZoom: 16,
+      // the workshop extent: the whole water supply area (west edge: the Leech River watershed, 123.895° W)
+      // to Sidney, Sooke to Victoria. Keep in step with ../../printed-maps/sheets/victoria.json.
+      bounds: [[-123.92, 48.28], [-123.18, 48.76]], minZoom: 2, maxZoom: 16,
       hash: true, attributionControl: false,
     });
     map.addControl(new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true } }), "top-right");

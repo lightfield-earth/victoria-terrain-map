@@ -9,17 +9,19 @@ This repo has no style of its own. `index.html` loads the global grayscale style
 https://terrain-bw.lightfield.earth/style.json (repo `copernicus-terrain-map-bw`), so improvements to that
 style show up here automatically. What's Victoria-specific lives here:
 
-- the opening view: `bounds` in `index.html`, the workshop extent (123.85–123.18° W, 48.28–48.76° N)
-- any Victoria-only customizations colleagues ask for: apply them to the loaded style in `index.html`
-  (or, if they grow, in a build step here), never by editing the global style for Victoria's sake
+- the opening view: `bounds` in `index.html`, the workshop extent (123.92–123.18° W, 48.28–48.76° N; the west edge clears the
+  Leech River watershed, the westernmost part of the water supply area)
+- any Victoria-only customizations colleagues ask for: `customize.js`, applied to the loaded style by
+  both the page and the print pipeline, never by editing the global style for Victoria's sake
 
-Current customizations (`customizeForVictoria` in `index.html`):
+Current customizations (`customize.js`):
 
 - **Salish Sea label**: regular size at z7, growing to 17.5 px at z9.5 and 22 px at z12, letter-spaced. The tiles
   class it `strait`, like any narrows, so it is picked out by name.
 
 Before the print, pin the style (copy `style.json` and `sprites/` here) so later changes to the global
-style can't alter the printed version. The print pipeline lives in `../../printed-maps/`.
+style can't alter the printed version. The print pipeline lives in `../../printed-maps/`; the sheet extent is in
+`../../printed-maps/sheets/victoria.json`.
 
 ## Run locally
 

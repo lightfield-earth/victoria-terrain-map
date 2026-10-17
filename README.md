@@ -13,6 +13,11 @@ style show up here automatically. What's Victoria-specific lives here:
 - any Victoria-only customizations colleagues ask for: apply them to the loaded style in `index.html`
   (or, if they grow, in a build step here), never by editing the global style for Victoria's sake
 
+Current customizations (`customizeForVictoria` in `index.html`):
+
+- **Salish Sea label**: larger as you zoom in (14 px at z7 to 22 px at z12) and letter-spaced. The tiles
+  class it `strait`, like any narrows, so it is picked out by name.
+
 Before the print, pin the style (copy `style.json` and `sprites/` here) so later changes to the global
 style can't alter the printed version. The print pipeline lives in `../../printed-maps/`.
 

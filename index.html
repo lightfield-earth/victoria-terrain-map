@@ -45,9 +45,11 @@
     const ocean = layer("Ocean labels");
     if (ocean) {
       const salish = ["==", ["get", "name"], "Salish Sea"], base = ocean.layout["text-size"] ?? 12;
+      // regular size out at z7, where it competes with city names; ~17.5 px at the z9.4 regional view
       ocean.layout["text-size"] = ["interpolate", ["linear"], ["zoom"],
-        7, ["case", salish, 14, base], 12, ["case", salish, 22, base]];
-      ocean.layout["text-letter-spacing"] = ["case", salish, 0.25, 0];
+        7, base, 9.5, ["case", salish, 17.5, base], 12, ["case", salish, 22, base]];
+      ocean.layout["text-letter-spacing"] = ["interpolate", ["linear"], ["zoom"],
+        7, ["case", salish, 0.1, 0], 9.5, ["case", salish, 0.25, 0]];
       ocean.layout["text-max-width"] = ["case", salish, 20, ocean.layout["text-max-width"] ?? 10];   // one line
     }
   }

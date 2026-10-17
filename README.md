@@ -15,7 +15,7 @@ style show up here automatically. What's Victoria-specific lives here:
 
 Current customizations (`customizeForVictoria` in `index.html`):
 
-- **Salish Sea label**: larger as you zoom in (14 px at z7 to 22 px at z12) and letter-spaced. The tiles
+- **Salish Sea label**: regular size at z7, growing to 17.5 px at z9.5 and 22 px at z12, letter-spaced. The tiles
   class it `strait`, like any narrows, so it is picked out by name.
 
 Before the print, pin the style (copy `style.json` and `sprites/` here) so later changes to the global

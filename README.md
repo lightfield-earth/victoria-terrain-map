@@ -18,6 +18,13 @@ Current customizations (`customize.js`):
 
 - **Salish Sea label**: regular size at z7, growing to 17.5 px at z9.5 and 22 px at z12, letter-spaced. The tiles
   class it `strait`, like any narrows, so it is picked out by name.
+- **Roads drawn evenly**: highway, trunk, primary and tertiary roads all take the secondary road's widths
+  and grays, so no road class dominates a sheet people draw on.
+- **Streams and their names from z11**: the tiles carry only the larger rivers below z13, so from z11 to
+  z13 the waterway layers draw from `data/waterways.geojson` (every waterway in the region, taken from the
+  tiles at z13) and label along `data/waterway-labels.geojson` (each named waterway smoothed so text can
+  follow it). `make_waterways.py` writes both; re-run it when the tile set changes. Outside its box
+  (124.10–123.00° W, 48.20–48.85° N), streams appear only from z13.
 
 Before the print, pin the style (copy `style.json` and `sprites/` here) so later changes to the global
 style can't alter the printed version. The print pipeline lives in `../../printed-maps/`; the sheet extent is in
